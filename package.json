@@ -1,0 +1,21 @@
+{
+  "name": "socket-app",
+  "version": "1.0.0",
+  "description": "Socket App Connect with IOS App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js & http-server ./"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^4.5.2",
+    "express": "^4.17.1",
+    "http-server": "^0.12.3",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0",
+    "vue": "^2.6.12",
+    "vue-socket.io-extended": "^4.0.4"
+  }
+}

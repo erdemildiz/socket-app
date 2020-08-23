@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Question&Answers</title>
+    <link
+      rel="stylesheet"
+      href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <div id="app" style="margin-top: 20px;">
+      <!-- Question -->
+      <div class="container" v-if="startOver && currentQuestion != null">
+        <div class="h3">{{ currentQuestion.question }}</div>
+        <ul class="list-group" v-if="currentQuestion.answers">
+          <li class="list-group-item" :class="{ active: userAnswer == 'A'}">
+            {{ currentQuestion.answers.A }}
+          </li>
+          <li class="list-group-item" :class="{ active: userAnswer == 'B'}">
+            {{ currentQuestion.answers.B }}
+          </li>
+          <li class="list-group-item" :class="{ active: userAnswer == 'C'}">
+            {{ currentQuestion.answers.C }}
+          </li>
+          <li class="list-group-item" :class="{ active: userAnswer == 'D'}">
+            {{ currentQuestion.answers.D }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Question  Reply-->
+      <div
+        class="container"
+        v-if="startOver && currentQuestion != null && !isCompleted && userAnswer != null"
+        style="margin-top: 20px;"
+      >
+        <div class="row">
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-success"
+              style="width: 200px;"
+              @click="replyAnswer(true)"
+            >
+              Doğru
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              style="width: 200px;"
+              @click="replyAnswer(false)"
+            >
+              Yanlış
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Completed-->
+      <div
+        class="container"
+        v-if="startOver && currentQuestion != null && isCompleted && !finishAll"
+        style="margin-top: 20px;"
+      >
+        <div class="row">
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-info"
+              style="width: 400px;"
+              @click="completeExam()"
+            >
+              Bitir
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- New Start -->
+      <div class="contaner" v-if="!startOver">
+        <div class="row">
+          <div class="col"></div>
+          <div class="col">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="newStartPermissioned"
+            >
+              Start
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="./node_modules/vue/dist/vue.min.js"></script>
+  <script src="./node_modules/socket.io-client/dist/socket.io.slim.js"></script>
+  <script src="./node_modules/vue-socket.io-extended/dist/vue-socket.io-ext.min.js"></script>
+  <script src="./questions.js"></script>
+  <script>
+    let socket = io("http://localhost:5000");
+    Vue.use(VueSocketIOExt, socket);
+    //  Vue
+    new Vue({
+      el: "#app",
+      data: {
+        startOver: false,
+        currentQuestionIndex: -1,
+        currentQuestion: null,
+        userAnswer: null,
+        replyedAnswer: null,
+        isCompleted: false,
+        finishAll: false,
+      },
+      mounted() {
+        this.$socket.$subscribe("user-answered", (userAnswer) => {
+          this.userAnswer = userAnswer;
+        });
+      },
+      methods: {
+        newStartPermissioned() {
+          this.startOver = !this.startOver;
+          this.emitData("new-start-request-status", this.startOver);
+          this.setNextQuestion();
+        },
+        setNextQuestion() {
+          this.currentQuestionIndex += 1;
+          this.currentQuestion = questions[this.currentQuestionIndex];
+          this.emitData("new-question", this.currentQuestion);
+        },
+        replyAnswer(answerStatus) {
+          this.replyedAnswer = answerStatus;
+          this.userAnswer = null;
+          // If answer is true, go next question
+          if (
+            this.replyedAnswer &&
+            questions.length != this.currentQuestionIndex + 1
+          ) {
+            this.emitData("reply", this.replyedAnswer);
+            this.setNextQuestion();
+          } else {
+            this.isCompleted = true;
+          }
+        },
+        completeExam() {
+          this.emitData("complete", this.currentQuestionIndex);
+          this.finishAll = true;
+        },
+        emitData(eventName, eventData) {
+          this.$socket.client.emit(eventName, eventData);
+        },
+      },
+    });
+  </script>
+</html>
