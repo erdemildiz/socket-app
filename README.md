@@ -41,3 +41,9 @@ cd client-app && pod install
     <td><img src="https://github.com/erdemildiz/socket-app/blob/master/screenshots/final.png?raw=true" width="350" /></td>
   </tr>
  </table>
+
+# If you getting http-server error try this
+
+```bash
+sudo npm i -g http-server
+```
