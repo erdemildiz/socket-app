@@ -47,6 +47,7 @@ class QuestionViewController: UIViewController {
             self.answerB.setTitle(question.answer.B, for: .normal)
             self.answerC.setTitle(question.answer.C, for: .normal)
             self.answerD.setTitle(question.answer.D, for: .normal)
+            self.timer?.invalidate()
             self.startTimer()
             self.totalRightAnswer += 1
         }
