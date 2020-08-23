@@ -11,7 +11,7 @@ npm install && npm run start
 Open
 
 ```bash
-[http://localhost:](http://127.0.0.1:8112)
+http://127.0.0.1:8112
 ```
 
 IOS App
