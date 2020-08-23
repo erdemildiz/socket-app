@@ -1,5 +1,7 @@
 # Question & Answer App
 
+![npm](https://img.shields.io/npm/v/npm) ![node-current](https://img.shields.io/node/v/2)
+
 ## Installation
 
 Socket Server
